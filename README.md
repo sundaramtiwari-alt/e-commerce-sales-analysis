@@ -28,6 +28,7 @@ See `ecommerce_sql_query.txt` and the SQL query screenshots in this repository.
 
 ## Power BI Dashboard
 An interactive dashboard was created to explore sales performance through KPI cards, charts, and filters.
+[Power BI Dashboard](powerbi_dashboard.png)
 
 ## Key Findings
 - Total revenue: 5,109,775.74
