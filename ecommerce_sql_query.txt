@@ -1,0 +1,297 @@
+E-COMMERCE SALES ANALYTICS PROJECT
+SQL Query Documentation
+Database: PostgreSQL
+Table: public.ecommerce_sales
+
+
+SQL1 -Overall Dataset / Data Validation
+Purpose:
+I used this query to get a quick understanding of the dataset and check that the imported data was available for analysis.
+
+What I learned:
+This is an important first step because it helps confirm that the dataset is loaded and gives a baseline before deeper analysis
+
+SQL Query-
+
+SELECT COUNT(*) AS total_records
+FROM public.ecommerce_sales;
+
+
+SQL2 -Overall Sales Performance
+Purpose:
+I used this query to get a high-level view of the business, including key sales and customer metrics.
+
+What I learned:
+Overall metrics provide a baseline for the dashboard and make it easier to compare performance across categories, regions, and time periods.
+
+SQL Query
+
+SELECT
+    SUM(revenue) AS total_revenue,
+    ROUND(AVG(revenue), 2) AS avg_revenue_per_record,
+    SUM(quantity) AS total_quantity_sold,
+    ROUND(AVG(customer_rating), 2) AS avg_customer_rating,
+    ROUND(AVG(delivery_days), 2) AS avg_delivery_days
+FROM public.ecommerce_sales;
+
+
+
+SQL3- Product Category Performance
+Purpose:
+I used this query to compare product categories based on revenue, quantity sold, and average customer rating.
+
+What I learned:
+It helps show which categories contribute more revenue and how their sales volume and customer ratings compare.
+
+SQL Query
+
+SELECT
+    product_category,
+    SUM(revenue) AS total_revenue,
+    SUM(quantity) AS total_quantity,
+    ROUND(AVG(customer_rating), 2) AS avg_rating
+FROM public.ecommerce_sales
+GROUP BY product_category
+ORDER BY total_revenue DESC;
+
+
+SQL4 - Regional Sales Analysis
+Purpose:
+I used this query to compare sales performance across regions.
+
+What I learned:
+Regional comparisons can highlight where sales are stronger or weaker and help guide further investigation.
+
+SQL Query
+
+SELECT
+    region,
+    SUM(revenue) AS total_revenue,
+    SUM(quantity) AS total_quantity,
+    ROUND(AVG(customer_rating), 2) AS avg_rating,
+    ROUND(AVG(delivery_days), 2) AS avg_delivery_days
+FROM public.ecommerce_sales
+GROUP BY region
+ORDER BY total_revenue DESC;
+
+
+SQL5-Payment Method Analysis
+Purpose:
+I used this query to understand how sales are distributed across payment methods.
+
+What I learned:
+This can help identify the payment methods used most often and compare the revenue associated with each one.
+
+
+SQL Query 
+
+
+SELECT
+    payment_method,
+    COUNT(*) AS total_orders,
+    SUM(revenue) AS total_revenue,
+    ROUND(AVG(revenue), 2) AS avg_revenue_per_order
+FROM public.ecommerce_sales
+GROUP BY payment_method
+ORDER BY total_revenue DESC;
+
+
+
+SQL6- Monthly Sales Trend
+Purpose:
+I grouped the data by month to compare revenue, order count, and quantity sold over time.
+
+What I learned:
+The results make it possible to see how sales change month by month and spot periods that may deserve a closer look.
+
+SQL Query
+
+SELECT
+    DATE_TRUNC('month', clear_order_date)::DATE AS sales_month,
+    SUM(revenue) AS total_revenue,
+    COUNT(*) AS total_orders,
+    SUM(quantity) AS total_quantity_sold
+FROM public.ecommerce_sales
+GROUP BY DATE_TRUNC('month', clear_order_date)
+ORDER BY sales_month;
+
+
+SQL7 -Customer Rating Analysis
+Purpose:
+I grouped orders by customer rating and calculated the number of records, average revenue, total revenue, and average delivery time for each rating.
+
+What I learned:
+This lets me compare sales and delivery measures across rating levels. It can help identify patterns worth investigating, although it does not prove that delivery time or revenue caused a particular rating.
+
+SQL Query
+
+
+SELECT
+    customer_rating,
+    COUNT(*) AS total_records,
+    ROUND(AVG(revenue), 2) AS avg_revenue,
+    ROUND(SUM(revenue), 2) AS total_revenue,
+    ROUND(AVG(delivery_days), 2) AS avg_delivery_days
+FROM public.ecommerce_sales
+GROUP BY customer_rating
+ORDER BY customer_rating;
+
+
+SQL8 -Delivery Performance
+Purpose:
+I grouped records by delivery duration to compare the number of orders, total revenue, and average customer rating for each delivery time.
+
+What I learned:
+The output helps compare performance across delivery durations and explore whether customer ratings differ for faster or slower deliveries.
+
+SQL Query
+
+
+SELECT
+    delivery_days,
+    COUNT(*) AS total_orders,
+    SUM(revenue) AS total_revenue,
+    ROUND(AVG(customer_rating), 2) AS avg_rating
+FROM public.ecommerce_sales
+GROUP BY delivery_days
+ORDER BY delivery_days;
+
+
+SQL9- Discount Analysis
+Purpose:
+I grouped records by discount value and measured record count, total quantity sold, total revenue, and average customer rating.
+
+What I learned:
+This gives me a way to compare sales outcomes across discount levels. It is useful for exploring discount patterns, but it does not by itself establish that a discount caused higher or lower sales.
+
+SQL Query
+
+
+SELECT
+    discount,
+    COUNT(*) AS total_records,
+    SUM(quantity) AS total_quantity_sold,
+    ROUND(SUM(revenue), 2) AS total_revenue,
+    ROUND(AVG(customer_rating), 2) AS avg_rating
+FROM public.ecommerce_sales
+GROUP BY discount
+ORDER BY discount;
+
+
+SQL10-Top 10 Revenue Records
+Purpose:
+I sorted the records from highest to lowest revenue and returned the top 10.
+
+What I learned:
+This helps me inspect the highest-revenue records and see details such as product category, region, quantity, payment method, and order date.
+
+SQL Query
+
+SELECT
+    order_id,
+    product_category,
+    region,
+    quantity,
+    revenue,
+    payment_method,
+    clear_order_date
+FROM public.ecommerce_sales
+ORDER BY revenue DESC
+LIMIT 10;
+
+
+SQL11- Region-wise Payment Preferences
+Purpose:
+I used this analysis to compare payment method preferences across regions.
+
+What I learned:
+It can show whether payment methods are used differently across regions, which may be useful when reviewing the customer checkout experience.
+
+SQL Query
+
+SELECT
+    region,
+    payment_method,
+    COUNT(*) AS total_records,
+    ROUND(SUM(revenue), 2) AS total_revenue
+FROM public.ecommerce_sales
+GROUP BY region, payment_method
+ORDER BY region, total_revenue DESC;
+
+
+SQL12 - Category Delivery Performance
+Purpose:
+I used this analysis to compare delivery performance across product categories.
+
+What I learned:
+This can help reveal whether average delivery time differs by category and identify areas that may need further investigation.
+
+
+SQL Query
+
+SELECT
+    product_category,
+    COUNT(*) AS total_records,
+    ROUND(AVG(delivery_days), 2) AS avg_delivery_days,
+    ROUND(AVG(customer_rating), 2) AS avg_customer_rating,
+    ROUND(SUM(revenue), 2) AS total_revenue
+FROM public.ecommerce_sales
+GROUP BY product_category
+ORDER BY avg_delivery_days DESC;
+
+
+
+
+SQL13- Category Revenue Contribution
+Purpose:
+I calculated each product category's revenue and its percentage contribution to total revenue.
+
+What I learned:
+Electronics contributed 35.81% of revenue, Clothing 29.98%, Home 19.22%, and Beauty 14.99% in the displayed result. Electronics was the largest contributor among these categories.
+
+SQL Query
+
+SELECT
+    product_category,
+    ROUND(SUM(revenue), 2) AS category_revenue,
+    ROUND(
+        SUM(revenue) * 100.0 /
+        SUM(SUM(revenue)) OVER (),
+        2
+    ) AS revenue_contribution_pct
+FROM public.ecommerce_sales
+GROUP BY product_category
+ORDER BY category_revenue DESC;
+
+
+SQL14 -Revenue Segmentation
+Purpose:
+I grouped records into two revenue segments: Low Revenue for records below 1000 and High Revenue for records of 1000 or more. I then compared the number of records, total revenue, and average revenue in each segment.
+
+What I learned:
+In the displayed output, High Revenue had 2,058 records and total revenue of 3,779,187.77, with average revenue of 1,836.34. Low Revenue had 2,942 records and total revenue of 1,330,587.97, with average revenue of 452.27. This shows that the smaller high-revenue segment contributed more total revenue. The 1000 threshold is a definition chosen for this analysis.
+
+SQL Query 
+
+SELECT
+    CASE
+        WHEN revenue < 1000 THEN 'Low Revenue'
+        ELSE 'High Revenue'
+    END AS revenue_segment,
+    COUNT(*) AS total_records,
+    ROUND(SUM(revenue), 2) AS total_revenue,
+    ROUND(AVG(revenue), 2) AS avg_revenue
+FROM public.ecommerce_sales
+GROUP BY
+    CASE
+        WHEN revenue < 1000 THEN 'Low Revenue'
+        ELSE 'High Revenue'
+    END
+ORDER BY total_revenue DESC;
+
+
+PROJECT SUMMARY:
+
+I used SQL to explore e-commerce sales from different angles: overall performance, category and regional comparisons, payment methods, monthly trends, customer ratings, delivery times, discounts, high-revenue records, and revenue contribution. The findings can then be presented in a Power BI dashboard.
+
+
